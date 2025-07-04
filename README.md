@@ -1,4 +1,4 @@
-# Effect Tagged Anyhow
+# Effect Tagged Contextual Error
 
 A tagged error system with context for Effect TS, inspired by Rust's anyhow crate. This library allows you to create typed errors with contextual information that forms a chain, making error debugging much easier.
 
