@@ -13,15 +13,18 @@ const callImageAPI = (imageUrl: string) =>
     })
   )
 
-const generateImageAltText = (imageUrl: string) =>
+const generateImageAltTextSuggestion = (imageUrl: string) =>
   pipe(
     callImageAPI(imageUrl),
-    withTaggedContext(ImageProcessingError, () => `Failed to generate accessibility text for image: ${imageUrl}`)
+    withTaggedContext(
+      ImageProcessingError,
+      () => `Failed to generate accessibility text for image: ${imageUrl}`
+    )
   )
 
 const processPageContent = (url: string) =>
   pipe(
-    generateImageAltText("https://example.com/images/diagram.webp"),
+    generateImageAltTextSuggestion("https://example.com/images/diagram.webp"),
     withTaggedContext(ContentError, () => `Error processing content for URL: ${url}`)
   )
 
@@ -35,7 +38,7 @@ const program = pipe(
   crawlAndGenerateToc([
     "https://example.com/guide/introduction",
     "https://example.com/guide/getting-started",
-    "https://example.com/guide/advanced"
+    "https://example.com/guide/advanced",
   ]),
   Effect.catchAll(error => {
     printErrorWithContext(error)

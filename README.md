@@ -41,7 +41,7 @@ const callImageAPI = (imageUrl: string) =>
   )
 
 // Generate accessibility text for an image
-const generateImageAltText = (imageUrl: string) =>
+const generateImageAltTextSuggestion = (imageUrl: string) =>
   pipe(
     callImageAPI(imageUrl),
     withTaggedContext(
@@ -54,7 +54,7 @@ const generateImageAltText = (imageUrl: string) =>
 const processPageContent = (url: string) =>
   pipe(
     // Simulate finding an image that needs alt text
-    generateImageAltText("https://example.com/images/diagram.webp"),
+    generateImageAltTextSuggestion("https://example.com/images/diagram.webp"),
     withTaggedContext(ContentError, () => `Error processing content for URL: ${url}`)
   )
 
@@ -102,7 +102,7 @@ Without context, you'd just see "Unsupported image format: WEBP" and have no ide
 - What operation was being attempted on the image
 - How many URLs were in the batch
 
-The context chain tells the complete story of the failure, making it easy to debug and potentially skip unsupported images or implement format conversion.
+The context chain tells the complete story of the failure, making it easy to debug.
 
 ### API
 
