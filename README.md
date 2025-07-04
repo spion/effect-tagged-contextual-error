@@ -5,7 +5,7 @@ A tagged error system with context for Effect TS, inspired by Rust's anyhow crat
 ## Features
 
 - Tagged errors with discriminated unions
-- Context chain similar to anyhow's `context()` method
+- Context chain similar to anyhow's `with_context()` method
 - Pretty printing of error chains
 - Full TypeScript type safety
 - Integration with Effect's error handling
