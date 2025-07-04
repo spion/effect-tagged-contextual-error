@@ -6,33 +6,46 @@ class ImageProcessingError extends TaggedError("ImageProcessingError") {}
 class ContentError extends TaggedError("ContentError") {}
 class CrawlError extends TaggedError("CrawlError") {}
 
-const callImageAPI = (imageUrl: string) =>
-  Effect.fail(
-    new APIError({
-      message: "Unsupported image format: WEBP",
-    })
-  )
+const callImageAPI = Effect.fn("callImageAPI")(function* (imageUrl: string) {
+  if (imageUrl.endsWith(".webp")) {
+    return yield* Effect.fail(
+      new APIError({
+        message: "Unsupported image format: WEBP",
+      })
+    )
+  } else {
+    // Simulate a successful API call for other formats
+    return `Generated alt text for ${imageUrl}`
+  }
+})
 
-const generateImageAltTextSuggestion = (imageUrl: string) =>
-  pipe(
-    callImageAPI(imageUrl),
+const generateImageAltTextSuggestion = Effect.fn("generateImageAltTextSuggestion")(function* (
+  imageUrl: string
+) {
+  return yield* callImageAPI(imageUrl).pipe(
     withTaggedContext(
       ImageProcessingError,
       () => `Failed to generate accessibility text for image: ${imageUrl}`
     )
   )
+})
 
-const processPageContent = (url: string) =>
-  pipe(
-    generateImageAltTextSuggestion("https://example.com/images/diagram.webp"),
+const processPageContent = Effect.fn("processPageContent")(function* (url: string) {
+  return yield* generateImageAltTextSuggestion("https://example.com/images/diagram.webp").pipe(
     withTaggedContext(ContentError, () => `Error processing content for URL: ${url}`)
   )
+})
 
-const crawlAndGenerateToc = (urls: string[]) =>
-  pipe(
-    processPageContent(urls[0]),
-    withTaggedContext(CrawlError, () => `Failed to complete web crawl for ${urls.length} URLs`)
-  )
+const crawlAndGenerateToc = Effect.fn("crawlAndGenerateToc")(function* (urls: string[]) {
+  let results = []
+  for (const url of urls) {
+    let resultForUrl = yield* processPageContent(url).pipe(
+      withTaggedContext(CrawlError, () => `Error processing URL: ${url}`)
+    )
+    results.push(resultForUrl)
+  }
+  return results
+})
 
 const program = pipe(
   crawlAndGenerateToc([
